@@ -1,0 +1,69 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  quantity  Int?
+  price     Float?
+  productId String?
+  order     Order?   @relation(fields: [orderId], references: [id])
+  orderId   String?
+}
+
+model Shipment {
+  id             String              @id @default(cuid())
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  trackingNumber String?
+  carrier        String?
+  status         EnumShipmentStatus?
+  order          Order?              @relation(fields: [orderId], references: [id])
+  orderId        String?
+}
+
+model Payment {
+  id        String             @id @default(cuid())
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  amount    Float?
+  method    EnumPaymentMethod?
+  status    EnumPaymentStatus?
+  order     Order?             @relation(fields: [orderId], references: [id])
+  orderId   String?
+}
+
+model Order {
+  id         String           @id @default(cuid())
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  total      Float?
+  status     EnumOrderStatus?
+  customerId String?
+  payments   Payment[]
+  shipments  Shipment[]
+  orderItems OrderItem[]
+}
+
+enum EnumShipmentStatus {
+  Option1
+}
+
+enum EnumPaymentMethod {
+  Option1
+}
+
+enum EnumPaymentStatus {
+  Option1
+}
+
+enum EnumOrderStatus {
+  Option1
+}
